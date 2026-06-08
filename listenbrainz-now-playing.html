@@ -232,6 +232,12 @@
 (function(){
   "use strict";
 
+  // When embedded in an iframe, let the host page background show through
+  if (window.self !== window.top){
+    document.documentElement.style.background = "transparent";
+    document.body.style.background = "transparent";
+  }
+
   // ---- config resolution: ?user= param wins, else hardcoded default ----
   const DEFAULT_USERNAME = "silwenae";   // <- optionally hardcode your username here
   const params = new URLSearchParams(location.search);
