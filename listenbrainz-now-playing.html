@@ -14,8 +14,8 @@
      ============================================================ */
 
   :root{
-    --bg-0:#0c0a11;
-    --bg-1:#15111d;
+    --bg-0:#1e2129;
+    --bg-1:#252b38;
     --card:rgba(31,24,42,0.66);
     --card-edge:rgba(255,255,255,0.08);
     --ink:#f4eee6;
@@ -231,12 +231,6 @@
 <script>
 (function(){
   "use strict";
-
-  // When embedded in an iframe, let the host page background show through
-  if (window.self !== window.top){
-    document.documentElement.style.background = "transparent";
-    document.body.style.background = "transparent";
-  }
 
   // ---- config resolution: ?user= param wins, else hardcoded default ----
   const DEFAULT_USERNAME = "silwenae";   // <- optionally hardcode your username here
