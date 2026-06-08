@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Now Playing · ListenBrainz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     CONFIG — set your ListenBrainz username here, OR pass it in
+     the URL as ?user=yourname when embedding the iframe.
+     ============================================================ */
+
+  :root{
+    --bg-0:#0c0a11;
+    --bg-1:#15111d;
+    --card:rgba(31,24,42,0.66);
+    --card-edge:rgba(255,255,255,0.08);
+    --ink:#f4eee6;
+    --ink-soft:#b9aea0;
+    --ink-faint:#776e84;
+    --accent:#ffae5c;
+    --accent-2:#ff6f91;
+    --glow-a:rgba(255,174,92,0.30);
+    --glow-b:rgba(255,111,145,0.22);
+    --radius:20px;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box}
+
+  html,body{height:100%}
+
+  body{
+    font-family:"Hanken Grotesk",sans-serif;
+    background:
+      radial-gradient(120% 90% at 18% 0%, var(--bg-1) 0%, var(--bg-0) 60%) ,
+      var(--bg-0);
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ambient breathing glow behind the card */
+  .stage{ position:relative; width:100%; max-width:440px; }
+  .stage::before{
+    content:"";
+    position:absolute; inset:-40px -20px;
+    background:
+      radial-gradient(60% 70% at 22% 30%, var(--glow-a), transparent 70%),
+      radial-gradient(55% 65% at 85% 80%, var(--glow-b), transparent 72%);
+    filter:blur(18px);
+    opacity:.0;
+    z-index:0;
+    transition:opacity .9s ease;
+    animation:breathe 7s ease-in-out infinite;
+  }
+  .stage.lit::before{ opacity:.85; }
+  @keyframes breathe{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+
+  /* grain */
+  .stage::after{
+    content:"";
+    position:absolute; inset:-40px -20px; z-index:0; pointer-events:none;
+    opacity:.05; mix-blend-mode:overlay; border-radius:30px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .card{
+    position:relative; z-index:1;
+    display:flex; gap:18px; align-items:center;
+    padding:18px;
+    background:var(--card);
+    border:1px solid var(--card-edge);
+    border-radius:var(--radius);
+    backdrop-filter:blur(22px) saturate(120%);
+    -webkit-backdrop-filter:blur(22px) saturate(120%);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.06) inset,
+      0 24px 60px -22px rgba(0,0,0,0.8);
+    opacity:0; transform:translateY(10px);
+    animation:rise .7s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  @keyframes rise{ to{opacity:1;transform:none} }
+
+  /* clickable wrapper -> ListenBrainz profile */
+  .card-link{
+    display:block; text-decoration:none; color:inherit;
+    border-radius:var(--radius); outline:none;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .card-link:hover{ transform:translateY(-2px); }
+  .card-link:hover .card{
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.08) inset,
+      0 30px 70px -22px rgba(0,0,0,0.85);
+    border-color:rgba(255,255,255,0.14);
+  }
+  .card-link:focus-visible{ box-shadow:0 0 0 2px var(--accent); }
+
+  /* artwork */
+  .art-wrap{ position:relative; flex:0 0 auto; }
+  .art{
+    width:104px; height:104px; border-radius:13px;
+    object-fit:cover; display:block;
+    background:linear-gradient(135deg,#2a2333,#1a1622);
+    box-shadow:0 14px 30px -14px rgba(0,0,0,.9), 0 0 0 1px rgba(255,255,255,.05) inset;
+  }
+  .art-wrap::after{ /* gloss */
+    content:""; position:absolute; inset:0; border-radius:13px;
+    background:linear-gradient(150deg, rgba(255,255,255,.16), transparent 38%);
+    pointer-events:none;
+  }
+  .art-fallback{
+    display:flex; align-items:center; justify-content:center;
+    color:var(--ink-faint); font-size:34px;
+  }
+  .spin{ animation:spin 16s linear infinite; }
+  @keyframes spin{ to{transform:rotate(360deg)} }
+
+  /* text block */
+  .meta{ min-width:0; flex:1; }
+  .eyebrow{
+    display:flex; align-items:center; gap:9px;
+    font-family:"DM Mono",monospace;
+    font-size:10.5px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:9px;
+  }
+  .eyebrow.past{ color:var(--ink-soft); }
+
+  /* equalizer */
+  .eq{ display:inline-flex; align-items:flex-end; gap:2.5px; height:13px; }
+  .eq span{
+    width:2.5px; background:linear-gradient(var(--accent),var(--accent-2));
+    border-radius:2px; height:30%;
+    animation:bounce .9s ease-in-out infinite;
+  }
+  .eq span:nth-child(2){animation-delay:.18s}
+  .eq span:nth-child(3){animation-delay:.38s}
+  .eq span:nth-child(4){animation-delay:.55s}
+  .eq span:nth-child(5){animation-delay:.27s}
+  @keyframes bounce{ 0%,100%{height:25%} 50%{height:100%} }
+  .paused-dot{ width:6px;height:6px;border-radius:50%;background:var(--ink-faint); }
+
+  .title{
+    font-family:"Fraunces",serif;
+    font-weight:600; font-size:22px; line-height:1.12;
+    letter-spacing:-.01em; color:var(--ink);
+    margin-bottom:5px;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .artist{
+    font-size:14.5px; font-weight:500; color:var(--ink-soft);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .album{
+    font-size:12.5px; color:var(--ink-faint);
+    margin-top:2px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .footer{
+    display:flex; align-items:center; gap:8px;
+    margin-top:12px; padding-top:11px;
+    border-top:1px solid rgba(255,255,255,0.07);
+    font-family:"DM Mono",monospace;
+    font-size:10.5px; color:var(--ink-faint); letter-spacing:.04em;
+  }
+  .footer .brand{ margin-left:auto; opacity:.7; }
+  .footer .brand b{ color:var(--ink-soft); font-weight:500; }
+
+  /* states: loading / empty / error / setup */
+  .panel{
+    position:relative; z-index:1;
+    padding:26px 22px; text-align:center;
+    background:var(--card); border:1px solid var(--card-edge);
+    border-radius:var(--radius);
+    backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
+    box-shadow:0 24px 60px -22px rgba(0,0,0,.8);
+  }
+  .panel h2{
+    font-family:"Fraunces",serif; font-weight:600; font-size:19px;
+    margin-bottom:6px; letter-spacing:-.01em;
+  }
+  .panel p{ font-size:13px; color:var(--ink-soft); line-height:1.5; }
+  .panel .mono{ font-family:"DM Mono",monospace; font-size:10.5px;
+    letter-spacing:.2em; text-transform:uppercase; color:var(--accent);
+    margin-bottom:12px; }
+
+  form{ display:flex; gap:8px; margin-top:16px; }
+  input{
+    flex:1; min-width:0; padding:11px 13px; font-size:14px;
+    font-family:"Hanken Grotesk",sans-serif;
+    background:rgba(0,0,0,.28); color:var(--ink);
+    border:1px solid rgba(255,255,255,.12); border-radius:11px;
+    outline:none; transition:border-color .2s;
+  }
+  input::placeholder{ color:var(--ink-faint); }
+  input:focus{ border-color:var(--accent); }
+  button{
+    padding:11px 16px; font-size:13px; font-weight:600;
+    font-family:"Hanken Grotesk",sans-serif; cursor:pointer;
+    color:#1a1208; border:none; border-radius:11px;
+    background:linear-gradient(135deg,var(--accent),#ff924d);
+    transition:transform .12s, filter .2s;
+  }
+  button:hover{ filter:brightness(1.06); }
+  button:active{ transform:scale(.97); }
+
+  /* skeleton shimmer */
+  .sk{ background:linear-gradient(100deg,rgba(255,255,255,.04) 30%,rgba(255,255,255,.11) 50%,rgba(255,255,255,.04) 70%);
+       background-size:200% 100%; animation:sheen 1.3s infinite; border-radius:7px; }
+  @keyframes sheen{ to{background-position:-200% 0} }
+  .sk-art{ width:104px;height:104px;border-radius:13px; }
+  .sk-line{ height:13px; margin-bottom:9px; }
+
+  .fade{ animation:fadein .45s ease forwards; }
+  @keyframes fadein{ from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div id="root"></div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- config resolution: ?user= param wins, else hardcoded default ----
+  const DEFAULT_USERNAME = "silwenae";   // <- optionally hardcode your username here
+  const params = new URLSearchParams(location.search);
+  let username = (params.get("user") || DEFAULT_USERNAME || "").trim();
+
+  const API = "https://api.listenbrainz.org/1";
+  const REFRESH_MS = 20000;
+  const root  = document.getElementById("root");
+  const stage = document.getElementById("stage");
+  let timer = null;
+
+  // ---------- helpers ----------
+  const esc = s => String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+  function coverUrl(meta){
+    const m = (meta && meta.mbid_mapping) || {};
+    if (m.caa_release_mbid && m.caa_id != null){
+      return `https://archive.org/download/mbid-${m.caa_release_mbid}/mbid-${m.caa_release_mbid}-${m.caa_id}_thumb250.jpg`;
+    }
+    const rel = m.release_mbid ||
+      (meta && meta.additional_info && meta.additional_info.release_mbid);
+    if (rel) return `https://coverartarchive.org/release/${rel}/front-250`;
+    return null;
+  }
+
+  function ago(ts){
+    if (!ts) return "";
+    const s = Math.max(1, Math.floor(Date.now()/1000 - ts));
+    if (s < 60)      return s + "s ago";
+    const m = Math.floor(s/60);  if (m < 60) return m + "m ago";
+    const h = Math.floor(m/60);  if (h < 24) return h + "h ago";
+    const d = Math.floor(h/24);  if (d < 7)  return d + "d ago";
+    return new Date(ts*1000).toLocaleDateString(undefined,{month:"short",day:"numeric"});
+  }
+
+  // ---------- data ----------
+  async function fetchJSON(url){
+    const r = await fetch(url, { headers:{ "Accept":"application/json" } });
+    if (r.status === 404) { const e = new Error("not_found"); e.code = 404; throw e; }
+    if (!r.ok) throw new Error("http_" + r.status);
+    return r.json();
+  }
+
+  async function load(){
+    if (!username) return renderSetup();
+    try {
+      // 1) what's playing right now
+      let data = await fetchJSON(`${API}/user/${encodeURIComponent(username)}/playing-now`);
+      let listens = (data.payload && data.payload.listens) || [];
+      if (listens.length){
+        return renderTrack(listens[0], true);
+      }
+      // 2) fall back to most recent listen
+      data = await fetchJSON(`${API}/user/${encodeURIComponent(username)}/listens?count=1`);
+      listens = (data.payload && data.payload.listens) || [];
+      if (listens.length){
+        return renderTrack(listens[0], false);
+      }
+      renderEmpty();
+    } catch (err){
+      renderError(err && err.code === 404 ? "notfound" : "network");
+    }
+  }
+
+  // ---------- renderers ----------
+  function renderTrack(listen, isLive){
+    const meta   = listen.track_metadata || {};
+    const title  = meta.track_name   || "Unknown track";
+    const artist = meta.artist_name  || "Unknown artist";
+    const album  = meta.release_name || "";
+    const when   = isLive ? "" : ago(listen.listened_at);
+    const cover  = coverUrl(meta);
+
+    stage.classList.toggle("lit", isLive);
+
+    const eyebrow = isLive
+      ? `<div class="eyebrow">
+           <span class="eq"><span></span><span></span><span></span><span></span><span></span></span>
+           Now Playing
+         </div>`
+      : `<div class="eyebrow past">
+           <span class="paused-dot"></span> Last Played${when ? " · " + esc(when) : ""}
+         </div>`;
+
+    const art = cover
+      ? `<img class="art" alt="" src="${esc(cover)}"
+              onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'art art-fallback',textContent:'\\u266A'}))">`
+      : `<div class="art art-fallback">&#9834;</div>`;
+
+    const profile = `https://listenbrainz.org/user/${encodeURIComponent(username)}/`;
+
+    root.innerHTML = `
+      <a class="card-link fade" href="${esc(profile)}" target="_blank" rel="noopener noreferrer">
+        <div class="card">
+          <div class="art-wrap">${art}</div>
+          <div class="meta">
+            ${eyebrow}
+            <div class="title">${esc(title)}</div>
+            <div class="artist">${esc(artist)}</div>
+            ${album ? `<div class="album">${esc(album)}</div>` : ""}
+            <div class="footer">
+              <span>${esc(username)}</span>
+              <span class="brand">via <b>ListenBrainz</b></span>
+            </div>
+          </div>
+        </div>
+      </a>`;
+  }
+
+  function renderLoading(){
+    stage.classList.remove("lit");
+    root.innerHTML = `
+      <div class="card">
+        <div class="sk sk-art"></div>
+        <div class="meta" style="flex:1">
+          <div class="sk sk-line" style="width:40%"></div>
+          <div class="sk sk-line" style="width:85%;height:20px"></div>
+          <div class="sk sk-line" style="width:55%"></div>
+        </div>
+      </div>`;
+  }
+
+  function renderEmpty(){
+    stage.classList.remove("lit");
+    root.innerHTML = `
+      <div class="panel fade">
+        <div class="mono">Silence</div>
+        <h2>Nothing playing yet</h2>
+        <p>No listens found for <b>${esc(username)}</b> right now. This will update automatically when a track is scrobbled.</p>
+      </div>`;
+  }
+
+  function renderError(kind){
+    stage.classList.remove("lit");
+    const msg = kind === "notfound"
+      ? `No ListenBrainz user named <b>${esc(username)}</b> was found.`
+      : `Couldn't reach ListenBrainz. It'll keep retrying automatically.`;
+    root.innerHTML = `
+      <div class="panel fade">
+        <div class="mono">Hmm</div>
+        <h2>${kind === "notfound" ? "User not found" : "Connection trouble"}</h2>
+        <p>${msg}</p>
+        ${kind === "notfound" ? `<form id="f"><input id="u" placeholder="ListenBrainz username" autocomplete="off"><button>Set</button></form>` : ""}
+      </div>`;
+    wireForm();
+  }
+
+  function renderSetup(){
+    stage.classList.remove("lit");
+    root.innerHTML = `
+      <div class="panel fade">
+        <div class="mono">Now Playing</div>
+        <h2>Connect your ListenBrainz</h2>
+        <p>Enter your username to show what you're listening to. Embed with <b>?user=name</b> to skip this step.</p>
+        <form id="f">
+          <input id="u" placeholder="ListenBrainz username" autocomplete="off" autofocus>
+          <button>Go</button>
+        </form>
+      </div>`;
+    wireForm();
+  }
+
+  function wireForm(){
+    const f = document.getElementById("f");
+    if (!f) return;
+    f.addEventListener("submit", function(e){
+      e.preventDefault();
+      const v = document.getElementById("u").value.trim();
+      if (!v) return;
+      username = v;
+      // keep it in the URL so a reload (when self-hosted) remembers it
+      const url = new URL(location.href);
+      url.searchParams.set("user", v);
+      history.replaceState(null, "", url);
+      start();
+    });
+  }
+
+  // ---------- lifecycle ----------
+  function start(){
+    if (timer) clearInterval(timer);
+    renderLoading();
+    load();
+    if (username) timer = setInterval(load, REFRESH_MS);
+  }
+
+  // pause polling when the tab/iframe isn't visible
+  document.addEventListener("visibilitychange", function(){
+    if (document.hidden){ if (timer){ clearInterval(timer); timer = null; } }
+    else if (username && !timer){ load(); timer = setInterval(load, REFRESH_MS); }
+  });
+
+  start();
+})();
+</script>
+</body>
+</html>
