@@ -4,6 +4,11 @@ A self-hosted "Now Playing" card that shows your current or most recent track fr
 
 ---
 
+![Widget example with the band Metric](metric.png)
+
+See it in action: [https://www.paulcutler.org/spinning/](https://www.paulcutler.org/spinning/)
+
+---
 ## Quick start
 
 1. Fork or clone this repo
