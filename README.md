@@ -1,14 +1,9 @@
 # ListenBrainz Now Playing Widget
 
-A self-hosted "Now Playing" card that shows your current or most recent track from [ListenBrainz](https://listenbrainz.org). Designed to be hosted on GitHub pages and it can be embedded as an iFrame on any website.
+A self-hosted "Now Playing" card that shows your current or most recent track from [ListenBrainz](https://listenbrainz.org). Designed to be embedded as an iframe on any website.
 
 ---
 
-![Widget example with the band Metric](metric.png)
-
-See it in action: [https://www.paulcutler.org/spinning/](https://www.paulcutler.org/spinning/)
-
----
 ## Quick start
 
 1. Fork or clone this repo
@@ -96,7 +91,7 @@ Sizing notes:
 
 ---
 
-## How it works
+## How the now-playing widget works
 
 - Polls the [ListenBrainz API](https://listenbrainz.org/api/) every 20 seconds
 - Shows **Now Playing** with an animated equalizer if a track is active
@@ -104,4 +99,19 @@ Sizing notes:
 - Clicking the card opens your ListenBrainz profile in a new tab
 - Polling pauses automatically when the tab or iframe is not visible
 
-Assisted by Claude (I know, I know).
+---
+
+## Weekly Top 5 Albums image generator
+
+`weekly-top5.html` generates a shareable **1200×1200 PNG** of your top 5 most-played albums for the week, complete with album cover art. Open the page, wait for your data to load, then click **Download PNG**.
+
+Deployed URL (after enabling Pages):
+```
+https://yourusername.github.io/your-repo-name/weekly-top5.html
+```
+
+The page uses the same `DEFAULT_USERNAME` and `?user=` override as the now-playing widget. It fetches data from the ListenBrainz weekly stats API and pre-loads all album art before rendering so the exported PNG is crisp and complete.
+
+---
+
+
