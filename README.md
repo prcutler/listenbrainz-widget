@@ -91,11 +91,10 @@ Sizing notes:
 
 ---
 
-## Weekly Top 5 Albums
+## Top 5 Albums
 
-`top5.html` — generates a shareable **1200×1200 PNG** of your top 5 most-played albums
-for the week, complete with album cover art. Open the page, wait for your data to load, then
-click **Download PNG**.
+`top5.html` — generates a shareable **1200×1200 PNG** of your top 5 most-played albums,
+complete with album cover art. Pick a time range from the dropdown, then click **Download PNG**.
 
 ### Generating an image
 
@@ -105,8 +104,9 @@ Once deployed (see [Deploying to GitHub Pages](#deploying-to-github-pages) above
 https://yourusername.github.io/your-repo-name/top5.html
 ```
 
-Wait for your top 5 albums to load with their cover art, then click **Download PNG**. The image
-is rendered at 2× resolution and ready to post to Instagram, Mastodon, Bluesky, and more.
+Choose a time range from the dropdown (see [Choosing a time range](#choosing-a-time-range) below),
+wait for your top 5 albums to load with their cover art, then click **Download PNG**. The image is
+rendered at 2× resolution and ready to post to Instagram, Mastodon, Bluesky, and more.
 
 ### Choosing a time range
 
