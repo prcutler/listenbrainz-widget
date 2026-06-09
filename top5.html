@@ -241,9 +241,10 @@
 
 <div class="chrome">
   <select class="range-sel" id="rangeSel" aria-label="Time range">
-    <option value="week">Last 7 days</option>
-    <option value="month">Last 30 days</option>
-    <option value="year">Last year</option>
+    <option value="this_week">This week</option>
+    <option value="week">Last week</option>
+    <option value="this_month">This month</option>
+    <option value="this_year">This year</option>
     <option value="all_time">All time</option>
   </select>
   <button id="dlBtn" disabled>Download PNG</button>
@@ -266,10 +267,11 @@
 
   // Title suffix shown on the card for each range value
   const RANGE_TITLES = {
-    week:     "This Week",
-    month:    "This Month",
-    year:     "This Year",
-    all_time: "of All Time",
+    this_week:  "This Week",
+    week:       "Last Week",
+    this_month: "This Month",
+    this_year:  "This Year",
+    all_time:   "of All Time",
   };
 
   // ---------- helpers ----------
