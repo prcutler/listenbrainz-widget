@@ -115,9 +115,36 @@ Use the dropdown to switch between **This week** (default), **Last week**, **Thi
 label is taken directly from the window ListenBrainz computed (its `from`/`to` timestamps).
 
 These are ListenBrainz's own **calendar** ranges, not rolling windows — "This week" is the current
-Monday-to-now week, "Last week" is the previous full Monday–Sunday week, and so on. ListenBrainz
-also recomputes these stats only periodically (roughly once a day), so very recent listens may take
-a little while to appear, and "This week" can lag a day behind.
+Monday-to-now week, "Last week" is the previous full Monday–Sunday week, and so on.
+
+#### A note on the ListenBrainz date ranges
+
+The [ListenBrainz statistics API](https://listenbrainz.readthedocs.io/en/latest/users/api/statistics.html)
+has two limitations worth understanding, because they affect which dates the card shows:
+
+1. **The ranges are fixed calendar periods, not rolling windows.** There is no "last 7 days" or
+   "last 30 days" option. `week` means the previous completed Monday–Sunday week, `month` means the
+   previous calendar month, etc. So selecting "Last week" will *not* give you the most recent seven
+   days.
+
+2. **The stats are batch-computed, roughly once a day, and lag behind real time.** A range only
+   reflects data up to the last time ListenBrainz recalculated it, so today's listens (and sometimes
+   yesterday's) won't appear yet.
+
+As a concrete example, here is what the API actually returned on **June 9, 2026**:
+
+| Dropdown option | API `range` | Window returned | Last updated |
+|---|---|---|---|
+| This week  | `this_week`  | Jun 1 – Jun 8  | Jun 3 |
+| Last week  | `week`       | May 25 – Jun 1 | Jun 2 |
+| This month | `this_month` | Jun 1 – now    | — |
+| This year  | `this_year`  | Jan 1 – now    | — |
+| All time   | `all_time`   | everything     | — |
+
+The card always shows the *real* window via the API's `from`/`to` timestamps, so you can see exactly
+which days each image covers. If you need a genuine up-to-the-minute, rolling 7-day total, that isn't
+available from the statistics API — it would require computing the totals yourself from the raw
+`/user/{name}/listens` endpoint.
 
 ### Username
 
