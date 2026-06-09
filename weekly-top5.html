@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/dist/html-to-image.js"></script>
 <style>
   /* ============================================================
      CONFIG — set your ListenBrainz username here, OR pass it in
@@ -64,8 +64,7 @@
     flex-shrink: 0;
   }
 
-  /* ambient glow — use rgba(...,0) instead of `transparent` so html2canvas
-     doesn't render the fade-out as opaque black (a dark vignette/mask) */
+  /* ambient glow */
   #card::before {
     content: "";
     position: absolute; inset: 0; pointer-events: none;
@@ -74,19 +73,13 @@
       radial-gradient(45% 40% at 92% 100%, var(--glow-b), rgba(31,24,42,0) 72%);
   }
 
-  /* grain — hidden during PNG export (html2canvas ignores mix-blend-mode,
-     which would render this as a flat darkening layer) */
+  /* grain */
   #card::after {
     content: "";
     position: absolute; inset: 0; pointer-events: none;
     opacity: .04; mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
-  /* html2canvas mis-stacks these full-card overlays (paints them OVER the
-     content and treats zero-alpha gradient stops as opaque), darkening
-     everything. Drop both decorative layers for the snapshot. */
-  #card.exporting::before,
-  #card.exporting::after { display: none; }
 
   /* ── Card header ───────────────────────────────────────────── */
   .c-header {
@@ -284,7 +277,7 @@
     return null;
   }
 
-  // Pre-fetch an image and return a data-URL (avoids html2canvas CORS issues)
+  // Pre-fetch an image and return a data-URL (inlined art exports cleanly)
   async function toDataURL(url){
     try {
       const res = await fetch(url);
@@ -407,32 +400,31 @@
     dlBtn.disabled = true;
     setStatus("Generating…");
 
-    // Pause animations + hide grain so the exported frame looks clean
-    card.classList.add("exporting");
+    // Pause the equalizer so the exported frame catches a clean, static state
     card.querySelectorAll(".eq span").forEach(el =>
       el.style.animationPlayState = "paused"
     );
 
     try {
-      const canvas = await html2canvas(card, {
-        scale: 2,
+      // html-to-image renders via the browser's own engine (SVG foreignObject),
+      // so colors, gradients, and blend modes match the page exactly.
+      const dataUrl = await htmlToImage.toPng(card, {
+        pixelRatio: 2,
         backgroundColor: "#1f182a",
-        useCORS: true,
-        logging: false,
+        cacheBust: true,
       });
 
       const link    = document.createElement("a");
       const today   = new Date().toISOString().slice(0, 10);
       link.download = `listenbrainz-top5-${today}.png`;
-      link.href     = canvas.toDataURL("image/png");
+      link.href     = dataUrl;
       link.click();
       setStatus("Downloaded!");
     } catch(err){
       setStatus("Export failed — check console");
       console.error(err);
     } finally {
-      // Restore grain + animations
-      card.classList.remove("exporting");
+      // Resume animations
       card.querySelectorAll(".eq span").forEach(el =>
         el.style.animationPlayState = ""
       );
