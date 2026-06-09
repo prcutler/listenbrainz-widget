@@ -1,6 +1,6 @@
 # ListenBrainz Now Playing Widget
 
-A self-hosted "Now Playing" card that shows your current or most recent track from [ListenBrainz](https://listenbrainz.org). Designed to be hosted on GitHub pages and it embedded as an iframe on any website.
+A self-hosted "Now Playing" card that shows your current or most recent track from [ListenBrainz](https://listenbrainz.org). Designed to be hosted on GitHub pages and it can be embedded as an iFrame on any website.
 
 ---
 
