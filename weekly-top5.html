@@ -50,10 +50,17 @@
   }
 
   /* ── Card ── the element captured as PNG ──────────────────── */
+  /* The ambient glow is baked into the element's OWN background (layered
+     gradients), NOT a ::before/::after pseudo-element. Export libraries
+     reproduce element backgrounds reliably but often mis-stack pseudo-
+     elements on top of content, which produced a dark wash over the PNG. */
   #card {
     width: 600px;
     min-height: 600px;
-    background: var(--card-bg);
+    background:
+      radial-gradient(55% 45% at 12% 0%,  rgba(255,174,92,0.18), rgba(31,24,42,0) 70%),
+      radial-gradient(45% 40% at 92% 100%, rgba(255,111,145,0.13), rgba(31,24,42,0) 72%),
+      var(--card-bg);
     border-radius: var(--radius);
     padding: 44px 48px 40px;
     display: flex;
@@ -62,23 +69,6 @@
     overflow: hidden;
     box-shadow: 0 32px 80px -20px rgba(0,0,0,0.85);
     flex-shrink: 0;
-  }
-
-  /* ambient glow */
-  #card::before {
-    content: "";
-    position: absolute; inset: 0; pointer-events: none;
-    background:
-      radial-gradient(55% 45% at 12% 0%,  var(--glow-a), rgba(31,24,42,0) 70%),
-      radial-gradient(45% 40% at 92% 100%, var(--glow-b), rgba(31,24,42,0) 72%);
-  }
-
-  /* grain */
-  #card::after {
-    content: "";
-    position: absolute; inset: 0; pointer-events: none;
-    opacity: .04; mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   /* ── Card header ───────────────────────────────────────────── */
@@ -140,11 +130,6 @@
     background: linear-gradient(135deg, #2a2333, #1a1622);
     box-shadow: 0 6px 16px -8px rgba(0,0,0,.8),
                 0 0 0 1px rgba(255,255,255,.05) inset;
-  }
-  .c-art-wrap::after { /* gloss */
-    content: ""; position: absolute; inset: 0;
-    background: linear-gradient(145deg, rgba(255,255,255,.14), rgba(255,255,255,0) 40%);
-    pointer-events: none;
   }
   .c-art {
     width: 100%; height: 100%; object-fit: cover; display: block;
