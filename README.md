@@ -1,19 +1,19 @@
-# ListenBrainz Now Playing Widget
+# ListenBrainz Widgets
 
-A self-hosted "Now Playing" card that shows your current or most recent track from [ListenBrainz](https://listenbrainz.org). Designed to be embedded as an iframe on any website.
-
----
-
-## Quick start
-
-1. Fork or clone this repo
-2. Set your username (see below)
-3. Deploy to GitHub Pages (see below)
-4. Embed the iframe on your site
+Two self-hosted widgets for your [ListenBrainz](https://listenbrainz.org) listening history:
+a live **Now Playing** card you can embed on your site, and a shareable **Weekly Top 5 Albums**
+image for social media. Both are single HTML files with no build step — set your username,
+deploy to GitHub Pages, and you're done. A landing page (`index.html`) links to both.
 
 ---
 
-## Setting your username
+## Now Playing Widget
+
+`listenbrainz-now-playing.html` — an auto-refreshing card that shows your current or most
+recent track, with album art and an animated equalizer. Designed to be embedded as an iframe
+on any website.
+
+### Setting your username
 
 **Option A — hardcode it** (recommended for a personal widget)
 
@@ -31,7 +31,8 @@ const DEFAULT_USERNAME = "yourname";
 
 **Option B — pass it in the URL**
 
-Leave `DEFAULT_USERNAME` empty and append `?user=yourname` to the iframe `src`. Useful if you want to reuse one hosted file for multiple profiles:
+Leave `DEFAULT_USERNAME` empty and append `?user=yourname` to the iframe `src`. Useful if you
+want to reuse one hosted file for multiple profiles:
 
 ```html
 <iframe src="https://yourusername.github.io/listenbrainz-widget/listenbrainz-now-playing.html?user=yourname" ...></iframe>
@@ -39,9 +40,7 @@ Leave `DEFAULT_USERNAME` empty and append `?user=yourname` to the iframe `src`. 
 
 If both are set, the `?user=` URL parameter wins.
 
----
-
-## Matching the background color to your site
+### Matching the background color to your site
 
 The widget background is controlled by two CSS variables near the top of the `<style>` block:
 
@@ -53,25 +52,18 @@ The widget background is controlled by two CSS variables near the top of the `<s
 --bg-1: #252b38;
 ```
 
-Change `--bg-0` to your site's background color and `--bg-1` to a slightly lighter shade of the same color. If your site has a light background, use light values (e.g. `--bg-0: #f5f5f5`).
+Change `--bg-0` to your site's background color and `--bg-1` to a slightly lighter shade of the
+same color. If your site has a light background, use light values (e.g. `--bg-0: #f5f5f5`).
 
----
+### Deploying to GitHub Pages
 
-## Deploying to GitHub Pages
-
-1. Push the file to a GitHub repository
+1. Push the files to a GitHub repository
 2. Go to **Settings → Pages** in your repo
 3. Under **Build and deployment**, set Source to **Deploy from a branch**
 4. Set Branch to `main` and folder to `/ (root)`, then click **Save**
-5. After ~1 minute your widget will be live at:
+5. After ~1 minute your widgets will be live at `https://yourusername.github.io/your-repo-name/`
 
-```
-https://yourusername.github.io/your-repo-name/listenbrainz-now-playing.html
-```
-
----
-
-## Embedding the iframe
+### Embedding the iframe
 
 ```html
 <iframe
@@ -89,9 +81,7 @@ Sizing notes:
 - `180px` height fits the card with no scrollbar
 - `border-radius` on the iframe clips the widget corners to match the card's rounded edges
 
----
-
-## How the now-playing widget works
+### How it works
 
 - Polls the [ListenBrainz API](https://listenbrainz.org/api/) every 20 seconds
 - Shows **Now Playing** with an animated equalizer if a track is active
@@ -101,17 +91,25 @@ Sizing notes:
 
 ---
 
-## Weekly Top 5 Albums image generator
+## Weekly Top 5 Albums
 
-`weekly-top5.html` generates a shareable **1200×1200 PNG** of your top 5 most-played albums for the week, complete with album cover art. Open the page, wait for your data to load, then click **Download PNG**.
+`weekly-top5.html` — generates a shareable **1200×1200 PNG** of your top 5 most-played albums
+for the week, complete with album cover art. Open the page, wait for your data to load, then
+click **Download PNG**.
 
-Deployed URL (after enabling Pages):
+### Generating an image
+
+Once deployed (see [Deploying to GitHub Pages](#deploying-to-github-pages) above), open:
+
 ```
 https://yourusername.github.io/your-repo-name/weekly-top5.html
 ```
 
-The page uses the same `DEFAULT_USERNAME` and `?user=` override as the now-playing widget. It fetches data from the ListenBrainz weekly stats API and pre-loads all album art before rendering so the exported PNG is crisp and complete.
+Wait for your top 5 albums to load with their cover art, then click **Download PNG**. The image
+is rendered at 2× resolution and ready to post to Instagram, Mastodon, Bluesky, and more.
 
----
+### Username
 
-
+The generator uses the same `DEFAULT_USERNAME` hardcode and `?user=yourname` URL override as the
+Now Playing widget. It fetches data from the ListenBrainz weekly stats API and pre-loads all album
+art before rendering so the exported PNG is crisp and complete.
