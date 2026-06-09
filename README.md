@@ -93,7 +93,7 @@ Sizing notes:
 
 ## Weekly Top 5 Albums
 
-`weekly-top5.html` — generates a shareable **1200×1200 PNG** of your top 5 most-played albums
+`top5.html` — generates a shareable **1200×1200 PNG** of your top 5 most-played albums
 for the week, complete with album cover art. Open the page, wait for your data to load, then
 click **Download PNG**.
 
@@ -102,14 +102,25 @@ click **Download PNG**.
 Once deployed (see [Deploying to GitHub Pages](#deploying-to-github-pages) above), open:
 
 ```
-https://yourusername.github.io/your-repo-name/weekly-top5.html
+https://yourusername.github.io/your-repo-name/top5.html
 ```
 
 Wait for your top 5 albums to load with their cover art, then click **Download PNG**. The image
 is rendered at 2× resolution and ready to post to Instagram, Mastodon, Bluesky, and more.
 
+### Choosing a time range
+
+Use the dropdown to switch between **This week** (default), **Last week**, **This month**,
+**This year**, and **All time**. The card heading and date range update to match, and the date
+label is taken directly from the window ListenBrainz computed (its `from`/`to` timestamps).
+
+These are ListenBrainz's own **calendar** ranges, not rolling windows — "This week" is the current
+Monday-to-now week, "Last week" is the previous full Monday–Sunday week, and so on. ListenBrainz
+also recomputes these stats only periodically (roughly once a day), so very recent listens may take
+a little while to appear, and "This week" can lag a day behind.
+
 ### Username
 
 The generator uses the same `DEFAULT_USERNAME` hardcode and `?user=yourname` URL override as the
-Now Playing widget. It fetches data from the ListenBrainz weekly stats API and pre-loads all album
+Now Playing widget. It fetches data from the ListenBrainz statistics API and pre-loads all album
 art before rendering so the exported PNG is crisp and complete.
