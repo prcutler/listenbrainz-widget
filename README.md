@@ -5,6 +5,8 @@ a live **Now Playing** card you can embed on your site, and a shareable **Weekly
 image for social media. Both are single HTML files with no build step — set your username,
 deploy to GitHub Pages, and you're done. A landing page (`index.html`) links to both.
 
+Also check out my [ListenBrainz Autoposter](https://github.com/prcutler/listenbrainz-autoposter) that automatically posts to Mastodon and / or BlueSky your weekly top listens.
+
 ---
 
 ## Now Playing Widget
