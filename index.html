@@ -209,6 +209,35 @@
   }
   .card:hover .card-link { gap: 12px; color: var(--blue); }
 
+  /* ── cross-promo callout ───────────────────────────────────── */
+  .callout { position: relative; z-index: 1; padding: 0 0 90px; }
+  .callout-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 28px; flex-wrap: wrap;
+    padding: 40px 44px;
+    border: 1px solid rgba(77,140,255,0.25);
+    border-radius: 20px;
+    background:
+      radial-gradient(80% 160% at 0% 0%, rgba(77,140,255,0.13), transparent 60%),
+      linear-gradient(180deg, var(--panel-2), var(--panel));
+  }
+  .callout-text { max-width: 620px; }
+  .callout-text .eyebrow { margin-bottom: 16px; }
+  .callout-text h2 {
+    font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+    color: var(--white); margin-bottom: 10px;
+  }
+  .callout-text p { color: var(--ink-soft); font-size: 16px; }
+  .callout-text b { color: var(--ink); font-weight: 600; }
+  .callout-text a.ex {
+    color: var(--blue-2); font-weight: 600;
+    text-decoration: underline; text-underline-offset: 2px;
+    transition: color .2s;
+  }
+  .callout-text a.ex:hover { color: var(--white); }
+  .callout .btn-primary { flex-shrink: 0; }
+  @media (max-width: 620px) { .callout-inner { padding: 30px 26px; } }
+
   /* ── footer ────────────────────────────────────────────────── */
   footer {
     position: relative; z-index: 1;
@@ -291,6 +320,20 @@
     </div>
   </main>
 
+  <!-- CROSS-PROMO -->
+  <section class="callout">
+    <div class="wrap">
+      <div class="callout-inner">
+        <div class="callout-text">
+          <div class="eyebrow"><span class="pulse"></span> ListenBrainz Autoposter</div>
+          <h2>Like these widgets?</h2>
+          <p>Also check out <a class="ex" href="https://github.com/prcutler/listenbrainz-autoposter" target="_blank" rel="noopener">ListenBrainz Autoposter</a> — automatically post your weekly top listens to <a class="ex" href="https://bsky.app/profile/paulcutler.org/post/3mnwtkmll5x2b" target="_blank" rel="noopener">Bluesky</a> or <a class="ex" href="https://hachyderm.io/@prcutler/116726090933605936" target="_blank" rel="noopener">Mastodon</a>, free, on a schedule with GitHub Actions.</p>
+        </div>
+        <a class="btn btn-primary" href="https://github.com/prcutler/listenbrainz-autoposter" target="_blank" rel="noopener">View the project →</a>
+      </div>
+    </div>
+  </section>
+
   <!-- FOOTER -->
   <footer>
     <div class="wrap footer-row">
@@ -299,6 +342,7 @@
         <a href="https://github.com/prcutler/listenbrainz-widget" target="_blank" rel="noopener">GitHub</a>
         <a href="listenbrainz-now-playing.html">Now Playing</a>
         <a href="top5.html">Top 5</a>
+        <a href="https://github.com/prcutler/listenbrainz-autoposter" target="_blank" rel="noopener">Autoposter</a>
       </div>
     </div>
   </footer>
